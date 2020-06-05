@@ -61,37 +61,6 @@ void logger::attach()
     logger::enablePrinting = true;
 }
 
-void logger::log(QFile file,
-                 QString level,
-                 const QMessageLogContext &context,
-                 const QString &msg)
-{
-    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
-    {
-        QTextStream ts(&file);
-
-        ts << QDateTime::currentDateTime().toString()
-           << level
-      #ifdef QT_DEBUG
-           << context.file
-           << " line: "
-           << context.line
-      #else
-           << "[file path and line number not available in release mode]"
-      #endif
-           << " - "
-           << msg
-           << Qt::endl;
-
-      #ifndef QT_DEBUG
-           Q_UNUSED(context);
-      #endif
-
-        ts.flush();
-        file.close();
-    }
-}
-
 /// Handler for qMessageLoggers that will print and log these messages
 void logger::handler(QtMsgType type,
                      const QMessageLogContext &context,
@@ -126,7 +95,6 @@ void logger::handler(QtMsgType type,
         QLockFile lock(file.fileName() +"l");
         lock.setStaleLockTime(50);
 
-        logAgain:
         if(lock.tryLock())
         {
             if(file.open(QIODevice::WriteOnly | QIODevice::Append))
@@ -155,11 +123,10 @@ void logger::handler(QtMsgType type,
         else
         {
             static qint32 i = 0;
-            i++;
-            qWarning() << "Another thread detected! Attemp #" << i;
+            qWarning() << "Another thread detected! Attemp #" << ++i;
             QThread::msleep(1);
-            goto logAgain;
             qWarning() << "Could not lock the file!";
+            handler(type, context, msg);  //retry logging
         }
     }
 

@@ -23,11 +23,6 @@ private:
 
     static bool createLogsDirectory();
 
-    static void log(QFile file,
-                    QString level,
-                    const QMessageLogContext &context,
-                    const QString &msg);
-
     static void handler(QtMsgType type,
                         const QMessageLogContext &context,
                         const QString & msg);
