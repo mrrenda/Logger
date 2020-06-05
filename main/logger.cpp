@@ -81,7 +81,7 @@ void logger::log(QFile file,
       #endif
            << " - "
            << msg
-           << endl;
+           << Qt::endl;
 
       #ifndef QT_DEBUG
            Q_UNUSED(context);
@@ -144,7 +144,7 @@ void logger::handler(QtMsgType type,
       #endif
                    << " - "
                    << msg
-                   << endl;
+                   << Qt::endl;
 
                 ts.flush();
                 file.close();
