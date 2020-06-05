@@ -23,8 +23,11 @@ unix { !macx { DEFINES += __linux__ } } # FOR LINUX SYSTEMS
 # STATIC LIBRARIES
 INCLUDEPATH += $$PWD/../main
 
-CONFIG(debug, debug|release) {
-    LIBS += -L$$OUT_PWD/../main/debug/ -llogger
-} else {
-    LIBS += -L$$OUT_PWD/../main/release/ -llogger
-}
+
+LIBS += -L$$OUT_PWD/../main/ -llogger
+#message($$OUT_PWD)
+#CONFIG(debug, debug|release) {
+#    LIBS += -L$$OUT_PWD/../main/debug/ -llogger
+#} else {
+#    LIBS += -L$$OUT_PWD/../main/release/ -llogger
+#}
