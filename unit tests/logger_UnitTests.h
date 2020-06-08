@@ -5,7 +5,6 @@
 #include <QTest>
 
 #include "logger.h"
-#include "initLogger.h"
 
 class loggerUnitTests : public QObject
 {

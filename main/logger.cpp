@@ -1,42 +1,44 @@
 #include "logger.h"
+#define LOGTODESKTOP
 
-/// Checkout - https://github.com/bimetek/qxtlogger/tree/master/qxtlogger
-
-bool logger::enableLogging = false;
-bool logger::enablePrinting = false;
-
-QString logger::LogsPath =
+QString Logger::LogsPath =
         QDir::currentPath()
         + QDir::separator()
         + "Logs";
 
-QString logger::LogFilePath =
-        logger::LogsPath
+QString Logger::LogFilePath =
+#ifndef LOGTODESKTOP
+        Logger2::LogsPath
         + QDir::separator()
         + QDateTime::currentDateTime().date().toString()
         + ".log";
-
-QString logger::LogFileDesktop =
+#else
         QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)
         + QDir::separator()
-        + "Rasp.log";
+        + "logs.log";
+#endif
 
-static const QtMessageHandler QT_DEFAULT_MESSAGE_HANDLER = qInstallMessageHandler(nullptr);
+bool Logger::enableLogging = false;
 
-/// Constructor - empty
-logger::logger(QObject *parent) : QObject(parent) { }
+Logger::Logger(QObject *parent) : QObject(parent) {}
 
-/// Create /Logs direcetory if does not already exist
-bool logger::createLogsDirectory()
+Logger::Logger(QString sFileName, int nLineNo)
 {
-    QDir dir(LogsPath);
+    this->sFileName = sFileName;
+    this->nLineNo   = nLineNo;
+}
+
+/// Create /Logs direcetory if it does not already exist
+bool Logger::createLogsDirectory()
+{
+    QDir dir(Logger::LogsPath);
 
     if(dir.exists())
     {
         return true;
     }
 
-    if(dir.mkpath(LogsPath))
+    if(dir.mkpath(Logger::LogsPath))
     {
         return true;
     }
@@ -49,64 +51,77 @@ bool logger::createLogsDirectory()
 }
 
 /// Attach handler to qMessageLoggers
-void logger::attach()
+void Logger::attach()
 {
     createLogsDirectory();
-
-    logger::enableLogging = true;
-    qInstallMessageHandler(logger::handler);
-
-    qInfo() << "Logger Initialized";
-
-    logger::enablePrinting = true;
+    Logger::enableLogging = true;
 }
 
-/// Handler for qMessageLoggers that will print and log these messages
-void logger::handler(QtMsgType type,
-                     const QMessageLogContext &context,
-                     const QString &msg)
+void Logger::Log(QString msg)
 {
-    if(logger::enableLogging)
-    {
-        QString level;
+    Logger::Log(LogLevel::INFO, msg);
+}
 
-        switch (type)
+void Logger::Log(LogLevel lvl, QString msg)
+{
+    QSharedMemory semaphore("loggingInProgress");
+
+    if(semaphore.lock())
+    {
+        QThread::msleep(1);
+        Logger::Log(lvl, msg);
+    }
+    else
+    {
+        QtConcurrent::run(this, &Logger::write, lvl, msg);
+    }
+}
+
+void Logger::write(LogLevel lvl, QString msg)
+{
+    if(Logger::enableLogging)
+    {
+        QString sLvl;
+
+        switch (lvl)
         {
-        case QtInfoMsg:
-            level = " Info: ";
+        case LogLevel::FATAL:
+            sLvl = " FATAL: ";
             break;
-        case QtDebugMsg:
-            level = " Debug: ";
+        case LogLevel::ERROR:
+            sLvl = " ERROR: ";
             break;
-        case QtWarningMsg:
-            level = " Warning: ";
+        case LogLevel::WARN:
+            sLvl = " WARN: ";
             break;
-        case QtCriticalMsg:
-            level = " Critical: ";
+        case LogLevel::INFO:
+            sLvl = " INFO: ";
             break;
-        case QtFatalMsg:
-            level = " Fatal: ";
+        case LogLevel::DEBUG:
+            sLvl = " DEBUG: ";
+            break;
+        case LogLevel::TRACE:
+            sLvl = " TRACE: ";
+            break;
+        case LogLevel::EVENT:
+            sLvl = " EVENT: ";
             break;
         }
 
-//        QFile file(LogFilePath);
-        QFile file (LogFileDesktop);
+        QFile file(Logger::LogFilePath);
 
-        QLockFile lock(file.fileName() +"l");
-        lock.setStaleLockTime(50);
-
-        if(lock.tryLock())
+        if(1)
         {
             if(file.open(QIODevice::WriteOnly | QIODevice::Append))
             {
                 QTextStream ts(&file);
 
                 ts << QDateTime::currentDateTime().toString()
-                   << level
+                   << sLvl
       #ifdef QT_DEBUG
-                   << context.file
+//                   << sFileName
                    << " line: "
-                   << context.line
+//                   << nLineNo
       #else
                    << "[file path and line number not available in release mode]"
       #endif
@@ -117,21 +132,10 @@ void logger::handler(QtMsgType type,
                 ts.flush();
                 file.close();
             }
-
-            lock.unlock();
         }
         else
         {
-            static qint32 i = 0;
-            qWarning() << "Another thread detected! Attemp #" << ++i;
-            QThread::msleep(1);
-            qWarning() << "Could not lock the file!";
-            handler(type, context, msg);  //retry logging
+            //retry logging
         }
-    }
-
-    if (logger::enablePrinting)
-    {
-        (*QT_DEFAULT_MESSAGE_HANDLER)(type, context, msg);
     }
 }

@@ -8,23 +8,26 @@ CONFIG -= app_bundle
 
 # PROJECT HEADERS
 HEADERS += \
-    initLogger.h \
     logger_UnitTests.h
 
 # PROJECT SOURCES
 SOURCES += \
-    main.cpp \
-    logger_UnitTests.cpp
+    logger_UnitTests.cpp \
+    main.cpp
 
 # DEFINITIONS
 win32 { DEFINES += __WINDOWS__ } # FOR WINDOWS SYSTEMS
 unix { !macx { DEFINES += __linux__ } } # FOR LINUX SYSTEMS
 
+# PROJECT OUTPUT INFO
+TARGET = loggerUnitTest
+DESTDIR = $$_PRO_FILE_PWD_/../bin/
+
 # STATIC LIBRARIES
-INCLUDEPATH += $$PWD/../main
+INCLUDEPATH += $$_PRO_FILE_PWD_/../main/
+LIBS += -L$$_PRO_FILE_PWD_/../bin/ -llogger
 
-
-LIBS += -L$$OUT_PWD/../main/ -llogger
+#LIBS += -L$$OUT_PWD/../main/ -llogger
 #message($$OUT_PWD)
 #CONFIG(debug, debug|release) {
 #    LIBS += -L$$OUT_PWD/../main/debug/ -llogger

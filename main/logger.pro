@@ -17,7 +17,6 @@ SOURCES += \
 win32 { DEFINES += __WINDOWS__ } # FOR WINDOWS SYSTEMS
 unix { !macx { DEFINES += __linux__ } } # FOR LINUX SYSTEMS
 
-#TODO
-# Default rules for deployment.
-unix { target.path = $$[QT_INSTALL_PLUGINS]/generic }
-!isEmpty(target.path): INSTALLS += target
+# PROJECT OUTPUT INFO
+TARGET = logger
+DESTDIR = $$_PRO_FILE_PWD_/../bin

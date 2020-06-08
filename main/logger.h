@@ -1,40 +1,60 @@
-#ifndef LOGGER_H
-#define LOGGER_H
+#ifndef LOGGER2_H
+#define LOGGER2_H
 
 #include <QObject>
-#include <QDebug>
 #include <QString>
 #include <QDir>
 #include <QDateTime>
-#include <QFile>
 #include <QTextStream>
-#include <QLoggingCategory>
-#include <QLockFile>
 #include <QStandardPaths>
-#include <QThread>
+#include <QMetaObject>
+#include <QDebug>
+#include <QtConcurrent/QtConcurrent>
 
-#include <iostream>
+#ifdef QT_DEBUG
+#define log Logger(__FILE__,__LINE__).Log
+#else
+#define log Logger().Log
+#endif
 
-class logger : public QObject
+enum LogLevel
+{
+    FATAL,
+    ERROR,
+    WARN,
+    INFO,
+    DEBUG,
+    TRACE,
+    EVENT
+};
+Q_DECLARE_METATYPE(LogLevel)
+
+class Logger : public QObject
 {
     Q_OBJECT
-private:
-    explicit logger(QObject *parent = nullptr);
+public:
+    Logger(QObject *parent = nullptr);
+    Logger(QString sFileName, int nLineNo);
+    void Log(QString msg);
+    void Log(LogLevel lvl, QString msg);
+    static void attach();
 
-    static bool createLogsDirectory();
-
-    static void handler(QtMsgType type,
-                        const QMessageLogContext &context,
-                        const QString & msg);
 public:
     static QString LogsPath;
     static QString LogFilePath;
-    static QString LogFileDesktop;
-
     static bool enableLogging;
-    static bool enablePrinting;
 
-    static void attach();
+private:
+    static bool createLogsDirectory();
+//    void write(LogLevel lvl, QString msg);
+
+private:
+    LogLevel logType;
+    QString sFileName = "";
+    int nLineNo = 0;
+
+public slots:
+    void write(LogLevel lvl, QString msg);
 };
 
-#endif // LOGGER_H
+#endif // LOGGER2_H
