@@ -26,11 +26,3 @@ DESTDIR = $$_PRO_FILE_PWD_/../bin/
 # STATIC LIBRARIES
 INCLUDEPATH += $$_PRO_FILE_PWD_/../main/
 LIBS += -L$$_PRO_FILE_PWD_/../bin/ -llogger
-
-#LIBS += -L$$OUT_PWD/../main/ -llogger
-#message($$OUT_PWD)
-#CONFIG(debug, debug|release) {
-#    LIBS += -L$$OUT_PWD/../main/debug/ -llogger
-#} else {
-#    LIBS += -L$$OUT_PWD/../main/release/ -llogger
-#}

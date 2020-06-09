@@ -27,13 +27,11 @@ enum LogLevel
     TRACE,
     EVENT
 };
-Q_DECLARE_METATYPE(LogLevel)
 
-class Logger : public QObject
+class Logger
 {
-    Q_OBJECT
 public:
-    Logger(QObject *parent = nullptr);
+    Logger();
     Logger(QString sFileName, int nLineNo);
     void Log(QString msg);
     void Log(LogLevel lvl, QString msg);
@@ -46,15 +44,12 @@ public:
 
 private:
     static bool createLogsDirectory();
-//    void write(LogLevel lvl, QString msg);
+    void write(LogLevel lvl, QString msg);
 
 private:
     LogLevel logType;
     QString sFileName = "";
     int nLineNo = 0;
-
-public slots:
-    void write(LogLevel lvl, QString msg);
 };
 
 #endif // LOGGER2_H

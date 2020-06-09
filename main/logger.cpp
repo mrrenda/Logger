@@ -20,7 +20,7 @@ QString Logger::LogFilePath =
 
 bool Logger::enableLogging = false;
 
-Logger::Logger(QObject *parent) : QObject(parent) {}
+Logger::Logger() { }
 
 Logger::Logger(QString sFileName, int nLineNo)
 {
@@ -120,8 +120,10 @@ void Logger::write(LogLevel lvl, QString msg)
                    << sLvl
       #ifdef QT_DEBUG
 //                   << sFileName
-                   << " line: "
-//                   << nLineNo
+//                   << " line: "
+//                   << nLineNo      //FIXME - Bug at "log" macro in header
+                                     //current method of obtaining file path
+                                     //and line number is not thread safe
       #else
                    << "[file path and line number not available in release mode]"
       #endif

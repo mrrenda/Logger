@@ -5,21 +5,22 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     Logger::attach();
+
     int i = 0;
+    qint64 timeTaken;
 
     QElapsedTimer timer;
     timer.start();
 
-    while(i != 100)
+    for(;i < 100; i++)
     {
-        log(LogLevel::INFO, "peeked " + QString::number(i));
-        qDebug() << "logged " << ++i;
+        log("benchmark log"); // FIXME - Bug somewhere, on windows I only read 39 lines of logs
     }
 
-    qDebug() << "Time elapsed " << timer.nsecsElapsed() << " nanoseconds";
-    qDebug() << "Average msec " << (double)timer.nsecsElapsed()/100000;
+    timeTaken = timer.nsecsElapsed();
 
-    a.exec();
+    qDebug() << "Time elapsed " << timeTaken << " nanoseconds";
+    qDebug() << "Average msec " << (double)timeTaken / 100000;
 
-    return 0;
+    return a.exec();
 }
