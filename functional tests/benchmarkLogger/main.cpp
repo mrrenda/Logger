@@ -7,20 +7,23 @@ int main(int argc, char *argv[])
     Logger::attach();
 
     int i = 0;
+    int logCount = 10;
     qint64 timeTaken;
 
     QElapsedTimer timer;
     timer.start();
 
-    for(;i < 100; i++)
+    for(;i < logCount; i++)
     {
-        log("benchmark log"); // FIXME - Bug somewhere, on windows I only read 39 lines of logs
+        Logger::getInstance().Log("benchmark log"); // FIXME - Bug somewhere, on windows I only read 39 lines of logs
     }
+
+    Logger::getInstance().Flush();
 
     timeTaken = timer.nsecsElapsed();
 
     qDebug() << "Time elapsed " << timeTaken << " nanoseconds";
-    qDebug() << "Average msec " << (double)timeTaken / 100000;
+    qDebug() << "Average msec " << (double)timeTaken / (1000 * logCount);
 
     return a.exec();
 }
