@@ -5,12 +5,12 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
     Logger::attach();
-    int i = 0;
+
+    qDebug() << "Started Logging";
 
     while(1)
     {
-        log(LogLevel::DEBUG, "loop");
-        qDebug() << "logged " << ++i;
+        Logger::getInstance().Log(LogLevel::DEBUG, "loop");
     }
 
     return a.exec();

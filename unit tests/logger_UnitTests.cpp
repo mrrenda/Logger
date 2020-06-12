@@ -9,7 +9,6 @@ void loggerUnitTests::loggingWriteTest()
     Logger::attach();
     Logger::getInstance().Log(LogLevel::INFO ,logString);
     Logger::getInstance().Flush();
-    QThread::sleep(2);
 }
 
 void loggerUnitTests::loggingReadTest()
@@ -60,4 +59,5 @@ void loggerUnitTests::loggingBenchmarkTest()
     {
         Logger::getInstance().Log(LogLevel::INFO, "logging benchmark test");
     }
+    Logger::getInstance().Flush();
 }

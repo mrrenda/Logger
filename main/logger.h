@@ -1,5 +1,5 @@
-#ifndef LOGGER2_H
-#define LOGGER2_H
+#ifndef LOGGER_H
+#define LOGGER_H
 
 #include <QObject>
 #include <QString>
@@ -10,6 +10,8 @@
 #include <QMetaObject>
 #include <QDebug>
 #include <QtConcurrent/QtConcurrent>
+
+#define FLUSHRATE 100000
 
 #ifdef QT_DEBUG
 //#define log Logger(__FILE__,__LINE__).Log
@@ -38,10 +40,10 @@ public:
         return instance;
     }
 
-public:
     Logger(Logger const&) = delete;
     void operator=(Logger const&) = delete;
 
+public:
 //    Logger(QString sFileName, int nLineNo);
     void Log(QString msg);
     void Log(LogLevel lvl, QString msg);
@@ -54,10 +56,11 @@ public:
     static bool enableLogging;
 
 private:
-    Logger() { buffer.reserve(2000000000); }
+    Logger() { buffer.reserve(FLUSHRATE + 1000); }
+    ~Logger() { flusher(); }
     static bool createLogsDirectory();
-    void write(LogLevel lvl, QString msg, QString dateTime);
-    void flusherThread();
+    void writer(LogLevel lvl, QString msg, QString dateTime);
+    void flusher();
 
 private:
     LogLevel logType;
@@ -66,4 +69,4 @@ private:
     QByteArray buffer;
 };
 
-#endif // LOGGER2_H
+#endif // LOGGER_H

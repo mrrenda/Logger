@@ -8,7 +8,7 @@ QString Logger::LogsPath =
 
 QString Logger::LogFilePath =
 #ifndef LOGTODESKTOP
-        Logger2::LogsPath
+        Logger::LogsPath
         + QDir::separator()
         + QDateTime::currentDateTime().date().toString()
         + ".log";
@@ -68,7 +68,8 @@ void Logger::Log(LogLevel lvl, QString msg)
         }
         else
         {
-            QtConcurrent::run(this, &Logger::write, lvl, msg, dateTime);
+//            QtConcurrent::run(this, &Logger::write, lvl, msg, dateTime);
+            Logger::writer(lvl, msg, dateTime);
         }
     }
 }
@@ -79,32 +80,28 @@ void Logger::Flush()
 
     if(semaphore.lock())
     {
-        QThread::msleep(1);
         Logger::Flush();
     }
     else
     {
 //        QtConcurrent::run(this, &Logger::flusher);
-        Logger::flusherThread();
+        Logger::flusher();
     }
 }
 
-void Logger::flusherThread()
+void Logger::flusher()
 {
     QFile file(Logger::LogFilePath);
 
     if(file.open(QIODevice::WriteOnly | QIODevice::Append))
     {
-        QTextStream ts(&file);
-
-        ts << buffer.data();
-
-        ts.flush();
+        file.write(buffer);
+        buffer.clear();
         file.close();
     }
 }
 
-void Logger::write(LogLevel lvl, QString msg, QString dateTime)
+void Logger::writer(LogLevel lvl, QString msg, QString dateTime)
 {
 
     QString sLvl;
@@ -138,4 +135,10 @@ void Logger::write(LogLevel lvl, QString msg, QString dateTime)
     buffer.append(sLvl);
     buffer.append(msg);
     buffer.append("\n");
+
+    if (buffer.size() > FLUSHRATE)
+    {
+        Logger::flusher();
+        buffer.clear();
+    }
 }

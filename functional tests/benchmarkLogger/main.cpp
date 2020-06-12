@@ -15,7 +15,8 @@ int main(int argc, char *argv[])
 
     for(;i < logCount; i++)
     {
-        Logger::getInstance().Log("benchmark log");
+//        Logger::getInstance().Log("benchmark log");
+        Logger::getInstance().Log("benchmark log #" + QString::number(i));
     }
 
     Logger::getInstance().Flush();
@@ -23,7 +24,7 @@ int main(int argc, char *argv[])
     timeTaken = timer.nsecsElapsed();
 
     qDebug() << "Time elapsed " << timeTaken << " nanoseconds";
-    qDebug() << "Average msec " << (double)timeTaken / (1000 * logCount);
+    qDebug() << "Average usec " << (double)timeTaken / (1000 * logCount);
 
     return a.exec();
 }
