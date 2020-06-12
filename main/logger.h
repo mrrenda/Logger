@@ -1,15 +1,12 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include <QObject>
 #include <QString>
 #include <QDir>
 #include <QDateTime>
-#include <QTextStream>
 #include <QStandardPaths>
-#include <QMetaObject>
+#include <QSharedMemory>
 #include <QDebug>
-#include <QtConcurrent/QtConcurrent>
 
 #define FLUSHRATE 100000
 

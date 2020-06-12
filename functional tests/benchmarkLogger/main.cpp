@@ -1,10 +1,10 @@
 #include <QCoreApplication>
+#include <QElapsedTimer>
+#include <QDebug>
 #include "logger.h"
 
-int main(int argc, char *argv[])
+int main()
 {
-    QCoreApplication a(argc, argv);
-
     int i = 0;
     int logCount = 10000;
     qint64 timeTaken;
@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     timeTaken = timer.nsecsElapsed();
 
     qDebug() << "Time elapsed " << timeTaken << " nanoseconds";
-    qDebug() << "Average usec " << (double)timeTaken / (1000 * logCount);
+    qDebug() << "Average time " << (double)timeTaken / (1000 * logCount) << " usec";
 
-    return a.exec();
+    return 0;
 }
