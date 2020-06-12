@@ -10,12 +10,6 @@
 
 #define FLUSHRATE 100000
 
-#ifdef QT_DEBUG
-//#define log Logger(__FILE__,__LINE__).Log
-#else
-//#define log Logger().Log
-#endif
-
 #define log Logger::getInstance
 
 class Logger
@@ -32,9 +26,7 @@ public:
     void operator=(Logger const&) = delete;
 
 public:
-//    Logger(QString sFileName, int nLineNo);
     void Flush();
-
     void Fatal(QString msg);
     void Error(QString msg);
     void Warn(QString msg);
@@ -61,8 +53,6 @@ private:
     void flusher();
 
 private:
-    QString sFileName = "";
-    int nLineNo = 0;
     QByteArray buffer;
 };
 
