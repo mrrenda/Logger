@@ -6,9 +6,8 @@ QString logString = "Testing Logger";
 
 void loggerUnitTests::loggingWriteTest()
 {
-    Logger::attach();
-    Logger::getInstance().Log(LogLevel::INFO ,logString);
-    Logger::getInstance().Flush();
+    log().Info(logString);
+    log().Flush();
 }
 
 void loggerUnitTests::loggingReadTest()
@@ -57,7 +56,7 @@ void loggerUnitTests::loggingBenchmarkTest()
 {
     QBENCHMARK
     {
-        Logger::getInstance().Log(LogLevel::INFO, "logging benchmark test");
+        log().Info("logging benchmark test");
     }
-    Logger::getInstance().Flush();
+    log().Flush();
 }

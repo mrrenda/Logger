@@ -42,58 +42,89 @@ bool Logger::createLogsDirectory()
     }
 }
 
-/// Attach handler to qMessageLoggers
-void Logger::attach()
+void Logger::Fatal(QString msg)
 {
-    createLogsDirectory();
-    Logger::enableLogging = true;
+    msg = QDateTime::currentDateTime().toString()
+            + " FATAL: "
+            + msg
+            + "\n";
+
+    writer(msg);
 }
 
-void Logger::Log(QString msg)
+void Logger::Error(QString msg)
 {
-    Logger::Log(LogLevel::INFO, msg);
+    msg = QDateTime::currentDateTime().toString()
+            + " ERROR: "
+            + msg
+            + "\n";
+
+    writer(msg);
 }
 
-void Logger::Log(LogLevel lvl, QString msg)
+void Logger::Warn(QString msg)
 {
-    if(Logger::enableLogging)
-    {
-        QString dateTime = QDateTime::currentDateTime().toString();
+    msg = QDateTime::currentDateTime().toString()
+            + " WARN: "
+            + msg
+            + "\n";
 
-        QSharedMemory semaphore("loggingInProgress");
+    writer(msg);
+}
 
-        if(semaphore.lock())
-        {
-            Logger::Log(lvl, msg);
-        }
-        else
-        {
-//            QtConcurrent::run(this, &Logger::write, lvl, msg, dateTime);
-            Logger::writer(lvl, msg, dateTime);
-        }
-    }
+void Logger::Info(QString msg)
+{
+    msg = QDateTime::currentDateTime().toString()
+            + " INFO: "
+            + msg
+            + "\n";
+
+    writer(msg);
+}
+
+void Logger::Debug(QString msg)
+{
+    msg = QDateTime::currentDateTime().toString()
+            + " DEBUG: "
+            + msg
+            + "\n";
+
+    writer(msg);
+}
+
+void Logger::Trace(QString msg)
+{
+    msg = QDateTime::currentDateTime().toString()
+            + " TRACE: "
+            + msg
+            + "\n";
+
+    writer(msg);
+}
+
+void Logger::Event(QString msg)
+{
+    msg = QDateTime::currentDateTime().toString()
+            + " EVENT: "
+            + msg
+            + "\n";
+
+    writer(msg);
 }
 
 void Logger::Flush()
 {
     QSharedMemory semaphore("flushingInProgress");
 
-    if(semaphore.lock())
-    {
-        Logger::Flush();
-    }
-    else
-    {
-//        QtConcurrent::run(this, &Logger::flusher);
-        Logger::flusher();
-    }
+    if(semaphore.lock()) { Logger::Flush(); }
+    else { Logger::flusher(); }
 }
 
 void Logger::flusher()
 {
     QFile file(Logger::LogFilePath);
 
-    if(file.open(QIODevice::WriteOnly | QIODevice::Append))
+    if(file.open(QIODevice::WriteOnly | QIODevice::Append) && !buffer.isEmpty())
     {
         file.write(buffer);
         buffer.clear();
@@ -101,44 +132,22 @@ void Logger::flusher()
     }
 }
 
-void Logger::writer(LogLevel lvl, QString msg, QString dateTime)
+void Logger::writer(QString data)
 {
-
-    QString sLvl;
-
-    switch (lvl)
+    if(Logger::enableLogging)
     {
-    case LogLevel::FATAL:
-        sLvl = " FATAL: ";
-        break;
-    case LogLevel::ERROR:
-        sLvl = " ERROR: ";
-        break;
-    case LogLevel::WARN:
-        sLvl = " WARN: ";
-        break;
-    case LogLevel::INFO:
-        sLvl = " INFO: ";
-        break;
-    case LogLevel::DEBUG:
-        sLvl = " DEBUG: ";
-        break;
-    case LogLevel::TRACE:
-        sLvl = " TRACE: ";
-        break;
-    case LogLevel::EVENT:
-        sLvl = " EVENT: ";
-        break;
-    }
+        QSharedMemory semaphore("loggingInProgress");
 
-    buffer.append(dateTime);
-    buffer.append(sLvl);
-    buffer.append(msg);
-    buffer.append("\n");
+        if(semaphore.lock()) { Logger::writer(data); }
+        else
+        {
+            if (buffer.size() > FLUSHRATE)
+            {
+                Logger::flusher();
+                buffer.clear();
+            }
 
-    if (buffer.size() > FLUSHRATE)
-    {
-        Logger::flusher();
-        buffer.clear();
+            buffer.append(data);
+        }
     }
 }

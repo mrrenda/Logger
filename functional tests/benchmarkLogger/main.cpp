@@ -4,7 +4,6 @@
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-    Logger::attach();
 
     int i = 0;
     int logCount = 10000;
@@ -15,11 +14,10 @@ int main(int argc, char *argv[])
 
     for(;i < logCount; i++)
     {
-//        Logger::getInstance().Log("benchmark log");
-        Logger::getInstance().Log("benchmark log #" + QString::number(i));
+        log().Info("benchmark log #" + QString::number(i));
     }
 
-    Logger::getInstance().Flush();
+    log().Flush();
 
     timeTaken = timer.nsecsElapsed();
 

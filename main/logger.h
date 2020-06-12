@@ -19,16 +19,7 @@
 //#define log Logger().Log
 #endif
 
-enum LogLevel
-{
-    FATAL,
-    ERROR,
-    WARN,
-    INFO,
-    DEBUG,
-    TRACE,
-    EVENT
-};
+#define log Logger::getInstance
 
 class Logger
 {
@@ -45,10 +36,15 @@ public:
 
 public:
 //    Logger(QString sFileName, int nLineNo);
-    void Log(QString msg);
-    void Log(LogLevel lvl, QString msg);
     void Flush();
-    static void attach();
+
+    void Fatal(QString msg);
+    void Error(QString msg);
+    void Warn(QString msg);
+    void Info(QString msg);
+    void Debug(QString msg);
+    void Trace(QString msg);
+    void Event(QString msg);
 
 public:
     static QString LogsPath;
@@ -56,14 +52,18 @@ public:
     static bool enableLogging;
 
 private:
-    Logger() { buffer.reserve(FLUSHRATE + 1000); }
+    Logger()
+    {
+        createLogsDirectory();
+        Logger::enableLogging = true;
+        buffer.reserve(FLUSHRATE + 1000);
+    }
     ~Logger() { flusher(); }
     static bool createLogsDirectory();
-    void writer(LogLevel lvl, QString msg, QString dateTime);
+    void writer(QString data);
     void flusher();
 
 private:
-    LogLevel logType;
     QString sFileName = "";
     int nLineNo = 0;
     QByteArray buffer;
