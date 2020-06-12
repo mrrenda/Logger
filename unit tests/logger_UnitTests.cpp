@@ -9,13 +9,12 @@ void loggerUnitTests::loggingWriteTest()
     Logger::attach();
     Logger::getInstance().Log(LogLevel::INFO ,logString);
     Logger::getInstance().Flush();
+    QThread::sleep(2);
 }
 
 void loggerUnitTests::loggingReadTest()
 {
     QFile file(Logger::LogFilePath);
-
-    QThread::sleep(1);
 
     if(!file.exists())
     {

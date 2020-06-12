@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     Logger::attach();
 
     int i = 0;
-    int logCount = 10;
+    int logCount = 10000;
     qint64 timeTaken;
 
     QElapsedTimer timer;
@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 
     for(;i < logCount; i++)
     {
-        Logger::getInstance().Log("benchmark log"); // FIXME - Bug somewhere, on windows I only read 39 lines of logs
+        Logger::getInstance().Log("benchmark log");
     }
 
     Logger::getInstance().Flush();

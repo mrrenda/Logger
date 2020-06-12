@@ -54,13 +54,10 @@ public:
     static bool enableLogging;
 
 private:
-    Logger()
-    {
-        buffer.reserve(65536);
-    }
+    Logger() { buffer.reserve(2000000000); }
     static bool createLogsDirectory();
-    void write(LogLevel lvl, QString msg);
-    void flusher();
+    void write(LogLevel lvl, QString msg, QString dateTime);
+    void flusherThread();
 
 private:
     LogLevel logType;
