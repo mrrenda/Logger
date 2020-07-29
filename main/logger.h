@@ -54,6 +54,7 @@ private:
 
 private:
     QByteArray buffer;
+    bool errorLog;
 };
 
 #endif // LOGGER_H

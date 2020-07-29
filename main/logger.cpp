@@ -44,6 +44,8 @@ bool Logger::createLogsDirectory()
 
 void Logger::Fatal(QString msg)
 {
+    errorLog = true;
+
     msg = QDateTime::currentDateTime().toString()
             + " FATAL: "
             + msg
@@ -54,6 +56,8 @@ void Logger::Fatal(QString msg)
 
 void Logger::Error(QString msg)
 {
+    errorLog = true;
+
     msg = QDateTime::currentDateTime().toString()
             + " ERROR: "
             + msg
@@ -64,6 +68,8 @@ void Logger::Error(QString msg)
 
 void Logger::Warn(QString msg)
 {
+    errorLog = true;
+
     msg = QDateTime::currentDateTime().toString()
             + " WARN: "
             + msg
@@ -74,6 +80,8 @@ void Logger::Warn(QString msg)
 
 void Logger::Info(QString msg)
 {
+    errorLog = false;
+
     msg = QDateTime::currentDateTime().toString()
             + " INFO: "
             + msg
@@ -84,6 +92,8 @@ void Logger::Info(QString msg)
 
 void Logger::Debug(QString msg)
 {
+    errorLog = true;
+
     msg = QDateTime::currentDateTime().toString()
             + " DEBUG: "
             + msg
@@ -94,6 +104,8 @@ void Logger::Debug(QString msg)
 
 void Logger::Trace(QString msg)
 {
+    errorLog = false;
+
     msg = QDateTime::currentDateTime().toString()
             + " TRACE: "
             + msg
@@ -104,6 +116,8 @@ void Logger::Trace(QString msg)
 
 void Logger::Event(QString msg)
 {
+    errorLog = true;
+
     msg = QDateTime::currentDateTime().toString()
             + " EVENT: "
             + msg
@@ -141,7 +155,7 @@ void Logger::writer(QString data)
         if(semaphore.lock()) { Logger::writer(data); }
         else
         {
-            if (buffer.size() > FLUSHRATE)
+            if (buffer.size() > FLUSHRATE || errorLog == true)
             {
                 Logger::flusher();
                 buffer.clear();
