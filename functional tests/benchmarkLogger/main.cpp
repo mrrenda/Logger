@@ -14,8 +14,13 @@ int main()
 
     for(;i < logCount; i++)
     {
-        log().Info("benchmark log #" + QString::number(i));
+//        log().Info("benchmark log #" + QString::number(i));
+//        log().test("benchmark log #", i);
     }
+
+    QString samil = "samil";
+    std::string asd = log().LOG("renda", "muhammed", 2, samil);
+    qDebug() << QString::fromStdString(asd);
 
     log().Flush();
 
