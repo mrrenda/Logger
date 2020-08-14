@@ -155,13 +155,11 @@ void Logger::writer(QString data)
         if(semaphore.lock()) { Logger::writer(data); }
         else
         {
-            if (buffer.size() + data.size() > FLUSHRATE || errorLog == true)
-            {
-                Logger::flusher();
-                buffer.clear();
-            }
+            if (buffer.size() + data.size() > FLUSHRATE) { Logger::flusher(); }
 
             buffer.append(data);
+
+            if(errorLog) { Logger::flusher(); }
         }
     }
 }
