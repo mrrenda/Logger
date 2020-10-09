@@ -157,7 +157,7 @@ void Logger::writer(QString data)
         {
             if (buffer.size() + data.size() > FLUSHRATE) { Logger::flusher(); }
 
-            buffer.append(data);
+            buffer.append(data.toUtf8());
 
             if(errorLog) { Logger::flusher(); }
         }
